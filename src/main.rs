@@ -79,6 +79,7 @@ async fn try_send_mail(path: &Path) -> Result<()> {
     let status = Command::new(&sendmail_command)
         .arg("--read-recipients")
         .arg("--read-envelope-from")
+        .args(env::args_os().skip(1))
         .stdin(file)
         .status()
         .await?;
