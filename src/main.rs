@@ -94,6 +94,6 @@ async fn try_send_mail(path: &Path) -> Result<()> {
     }
 }
 
-fn display<'a>(s: &'a OsStr) -> impl Display + 'a {
+fn display(s: &OsStr) -> impl Display + '_ {
     Path::new(s).display()
 }
