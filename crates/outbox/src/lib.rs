@@ -5,6 +5,8 @@ use tokio::io::AsyncWriteExt as _;
 use zbus::zvariant::OwnedFd;
 use zbus::Connection;
 
+pub use zbus;
+
 pub async fn queue(connection: &Connection, data: &[u8]) -> Result<()> {
     let proxy = dbus::OutboxProxy::new(connection).await?;
     let (pipe_reader, pipe_writer) = os_pipe::pipe()?;
