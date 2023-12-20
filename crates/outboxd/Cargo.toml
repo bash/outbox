@@ -1,0 +1,11 @@
+[package]
+name = "outboxd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+tokio = { version = "1.32.0", features = ["full"] }
+serde = { version = "1.0.193", features = ["derive"] }
+zbus = { version = "3.14.1", default-features = false, features = ["tokio"] }
+uuid = { version = "1.4.1", features = ["v4"] }
