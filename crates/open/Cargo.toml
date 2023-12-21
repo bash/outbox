@@ -1,0 +1,10 @@
+[package]
+name = "open"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+dirs = "5.0.1"
+libc = "0.2.151"
+opener = "0.6.1"
