@@ -21,6 +21,7 @@ pub async fn queue(connection: &Connection, data: &[u8]) -> Result<()> {
 }
 
 mod dbus {
+    use std::fmt;
     use zbus::zvariant::OwnedFd;
     use zbus::{dbus_proxy, DBusError};
 
@@ -34,10 +35,23 @@ mod dbus {
     }
 
     #[derive(Debug, DBusError)]
-    #[dbus_error(prefix = "garden.tau.Outbox")]
+    #[dbus_error(prefix = "garden.tau.Outbox", impl_display = false)]
     pub(crate) enum QueueError {
         #[dbus_error(zbus_error)]
         Zbus(zbus::Error),
         Io(String),
+    }
+
+    impl fmt::Display for QueueError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let name = self.name();
+            match self {
+                Self::Zbus(e) => write!(f, "{name}: {e}"),
+                _ => {
+                    let description = self.description().unwrap_or("no description");
+                    write!(f, "{name}: {description}")
+                }
+            }
+        }
     }
 }
