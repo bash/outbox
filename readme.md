@@ -84,7 +84,7 @@ allow system_dbusd_t unconfined_service_t:fifo_file read;
 ```
 
 Then generate and install the module:
-```shell
+```sh
 checkmodule -M -m -o dbus_allow_fifo_read.mod dbus_allow_fifo_read.te
 semodule_package -o dbus_allow_fifo_read.pp -m dbus_allow_fifo_read.mod
 semodule -i dbus_allow_fifo_read.pp
