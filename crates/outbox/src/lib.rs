@@ -7,17 +7,38 @@ use zbus::Connection;
 
 pub use zbus;
 
-pub async fn queue(connection: &Connection, data: &[u8]) -> Result<()> {
-    let proxy = dbus::OutboxProxy::new(connection).await?;
-    let (pipe_reader, pipe_writer) = os_pipe::pipe()?;
-    let pipe_reader = unsafe { OwnedFd::from_raw_fd(pipe_reader.as_raw_fd()) };
-    let mut pipe_writer = unsafe { File::from_raw_fd(pipe_writer.as_raw_fd()) };
-    let future = proxy.queue(pipe_reader);
-    pipe_writer.write_all(data).await?;
-    pipe_writer.flush().await?;
-    drop(pipe_writer);
-    future.await?;
-    Ok(())
+#[derive(Debug, Clone)]
+pub struct Outbox(Connection);
+
+impl Outbox {
+    /// Creates a new [`Connection`]
+    pub fn new(connection: Connection) -> Self {
+        Outbox(connection)
+    }
+
+    /// Create an [`Outbox`] connected to the session/user bus.
+    pub async fn session() -> Result<Self> {
+        Ok(Outbox::new(Connection::session().await?))
+    }
+
+    /// Create an [`Outbox`] connected to the system bus.
+    pub async fn system() -> Result<Self> {
+        Ok(Outbox::new(Connection::system().await?))
+    }
+
+    /// Adds a new message to the queue.
+    pub async fn queue(&self, data: &[u8]) -> Result<()> {
+        let proxy = dbus::OutboxProxy::new(&self.0).await?;
+        let (pipe_reader, pipe_writer) = os_pipe::pipe()?;
+        let pipe_reader = unsafe { OwnedFd::from_raw_fd(pipe_reader.as_raw_fd()) };
+        let mut pipe_writer = unsafe { File::from_raw_fd(pipe_writer.as_raw_fd()) };
+        let future = proxy.queue(pipe_reader);
+        pipe_writer.write_all(data).await?;
+        pipe_writer.flush().await?;
+        drop(pipe_writer);
+        future.await?;
+        Ok(())
+    }
 }
 
 mod dbus {
