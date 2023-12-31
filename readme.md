@@ -15,12 +15,14 @@ Description=A rudimentary outbox that delivers mail using a sendmail compatible 
 After=network-online.target
 
 [Service]
+Type=dbus
 BusName=garden.tau.Outbox
-ExecStart=/usr/local/bin/outboxd -d -C /etc/outbox/msmtprc
+ExecStart=/usr/local/bin/outboxd -C /etc/outbox/msmtprc --logfile /var/log/outbox/msmtp.log
 Restart=always
 RestartSec=10
+User=outboxd
+Group=outboxd
 PrivateDevices=yes
-PrivateNetwork=yes
 PrivateTmp=yes
 ProtectProc=invisible
 ProtectControlGroups=yes
@@ -29,8 +31,13 @@ ProtectKernelLogs=yes
 ProtectKernelModules=yes
 ProtectKernelTunables=yes
 ProtectSystem=strict
-ReadWritePaths=/var/lib/outbox /var/log/msmtp
+ReadWritePaths=/var/lib/outbox /var/log/outbox
 Environment=SENDMAIL=/usr/local/bin/msmtp
+WorkingDirectory=/var/lib/outbox
+```
+
+```sh
+useradd --system outboxd --shell /sbin/nologin
 ```
 
 **/usr/local/share/dbus-1/system-services/garden.tau.Outbox.service**
@@ -40,7 +47,7 @@ See the [DBus Specification] for details.
 [D-BUS Service]
 Name=garden.tau.Outbox
 Exec=/bin/false
-User=root
+User=outboxd
 SystemdService=outboxd.service
 ```
 
@@ -54,7 +61,7 @@ See the [DBus Specification] for details.
  "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
 <busconfig>
-  <policy user="root">
+  <policy user="outboxd">
     <allow own="garden.tau.Outbox"/>
   </policy>
 

@@ -1,0 +1,84 @@
+# The following tag is to get correct syntax highlighting for this file in vim text editor
+# vim: syntax=spec
+
+# git_dir_name returns repository name derived from remote Git repository URL
+Name:       {{{ git_dir_name }}}
+
+# git_dir_version returns version based on commit and tag history of the Git project
+Version:    {{{ git_dir_version }}}
+
+# This can be useful later for adding downstream patches
+Release:    1%{?dist}
+
+# Basic description of the package
+Summary:    Hello rpkg package.
+
+# License. We assume GPLv2+ here.
+License:    GPLv2+
+
+# Home page of the project. Can also point to the public Git repository page.
+# URL:        https://pagure.io/hello_rpkg
+
+# Detailed information about the source Git repository and the source commit
+# for the created rpm package
+VCS:        {{{ git_dir_vcs }}}
+
+# git_dir_pack macro places the repository content (the source files) into a tarball
+# and returns its filename. The tarball will be used to build the rpm.
+Source:     {{{ git_dir_pack }}}
+
+%{?systemd_requires}
+BuildRequires: cargo
+BuildRequires: systemd
+
+Requires: msmtp
+
+%description
+This is a hello world package.
+
+# This disables the debug package
+%global debug_package %{nil}
+
+%prep
+{{{ git_dir_setup_macro }}}
+
+%build
+BINDIR=%{_bindir} SYSCONFDIR=%{_sysconfdir} LOGDIR=%{_localstatedir}/log SHAREDSTATEDIR=%{_sharedstatedir} envsubst < rpm/outboxd.service > outboxd.service
+cargo build --release --package outboxd
+
+%install
+install -D -p -m 755 target/release/outboxd %{buildroot}%{_bindir}/outboxd
+install -D -p -m 644 rpm/outbox.sysusers %{buildroot}%{_sysusersdir}/%{name}.conf
+install -D -p -m 644 outboxd.service %{buildroot}%{_unitdir}/outboxd.service
+install -D -p -m 644 rpm/garden.tau.Outbox.service %{buildroot}%{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
+install -D -p -m 644 rpm/garden.tau.Outbox.conf %{buildroot}%{_datarootdir}/dbus-1/system.d/garden.tau.Outbox.conf
+install -D -p -m 600 rpm/msmtprc %{buildroot}%{_sysconfdir}/outboxd/msmtprc
+install -D -d -m 700 %{buildroot}%{_sharedstatedir}/outboxd
+install -D -d -m 700 %{buildroot}%{_localstatedir}/log/outboxd
+
+%pre
+%sysusers_create_package %{name} rpm/outbox.sysusers
+
+%post
+%systemd_post outboxd.service
+
+%preun
+%systemd_preun outboxd.service
+
+%postun
+%systemd_postun_with_restart outboxd.service
+
+%files
+%{_sysusersdir}/%{name}.conf
+%{_bindir}/outboxd
+%{_unitdir}/outboxd.service
+%{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
+%{_datarootdir}/dbus-1/system.d/garden.tau.Outbox.conf
+%config(noreplace) %attr(-, outboxd, outboxd) %{_sysconfdir}/outboxd/msmtprc
+%dir %attr(-, outboxd, outboxd) %{_sharedstatedir}/outboxd
+%dir %attr(-, outboxd, outboxd) %{_localstatedir}/log/outboxd
+
+# Finally, changes from the latest release of your application are generated from
+# your project's Git history. It will be empty until you make first annotated Git tag.
+# %changelog
+# {{{ git_dir_changelog }}}
