@@ -1,79 +1,14 @@
 # Outbox 📤
-A very crude attempt at a mail queue for `sendmail`-compatible tools like `msmtp` that lack queues.
+A mail queue daemon for msmtp.
 
-## Running Locally
+## Installing
+TODO
+
+## Using during Development
 Use `make run` to run `outboxd` using the session bus.
 Instead of sending emails it will open them in the default email program.
 
-## Example Config
-### Systemd Unit
-
-**/etc/systemd/system/outboxd.service**
-```desktop
-[Unit]
-Description=A rudimentary outbox that delivers mail using a sendmail compatible command
-After=network-online.target
-
-[Service]
-Type=dbus
-BusName=garden.tau.Outbox
-ExecStart=/usr/local/bin/outboxd -C /etc/outbox/msmtprc --logfile /var/log/outbox/msmtp.log
-Restart=always
-RestartSec=10
-User=outboxd
-Group=outboxd
-PrivateDevices=yes
-PrivateTmp=yes
-ProtectProc=invisible
-ProtectControlGroups=yes
-ProtectHome=yes
-ProtectKernelLogs=yes
-ProtectKernelModules=yes
-ProtectKernelTunables=yes
-ProtectSystem=strict
-ReadWritePaths=/var/lib/outbox /var/log/outbox
-Environment=SENDMAIL=/usr/local/bin/msmtp
-WorkingDirectory=/var/lib/outbox
-```
-
-```sh
-useradd --system outboxd --shell /sbin/nologin
-```
-
-**/usr/local/share/dbus-1/system-services/garden.tau.Outbox.service**
-See the [DBus Specification] for details.
-
-```desktop
-[D-BUS Service]
-Name=garden.tau.Outbox
-Exec=/bin/false
-User=outboxd
-SystemdService=outboxd.service
-```
-
-### DBus Config
-See the [DBus Specification] for details.
-
-**/etc/dbus-1/system.d/garden.tau.Outbox.conf**
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE busconfig PUBLIC
- "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
- "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-<busconfig>
-  <policy user="outboxd">
-    <allow own="garden.tau.Outbox"/>
-  </policy>
-
-  <!-- Allow our other service to use the garden.tau.Outbox bus -->
-  <!-- You can alternatively use <policy context="default"> to allow it to everyone. -->
-  <policy user="game-night-service">
-    <allow send_destination="garden.tau.Outbox" />
-  </policy>
-</busconfig>
-```
-
-### SELinux
+## SELinux
 If you have SELinux enabled, it might cause issues with passing fifo pipes.
 This can be solved using a custom module.
 

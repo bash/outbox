@@ -1,5 +1,5 @@
 [Unit]
-Description=A rudimentary outbox that delivers mail using a sendmail compatible command
+Description=A mail queue daemon for msmtp
 After=network-online.target
 
 [Service]
