@@ -1,0 +1,13 @@
+[package]
+name = "outbox"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+serde = { version = "1.0.193", features = ["derive"] }
+zbus = { version = "3.14.1", default-features = false, features = ["tokio"] }
+tokio = { version = "1.32.0", features = ["fs"] }
+async-trait = "0.1.75"
+tokio-pipe = "0.2.12"
+
