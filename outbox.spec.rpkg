@@ -27,10 +27,14 @@ A mail queue daemon for msmtp
 %build
 BINDIR=%{_bindir} SYSCONFDIR=%{_sysconfdir} LOGDIR=%{_localstatedir}/log SHAREDSTATEDIR=%{_sharedstatedir} envsubst < systemd/system/outboxd.service > outboxd.service
 SHAREDSTATEDIR=%{_sharedstatedir} envsubst < sysusers.d/outbox.conf > outbox-sysusers.conf
+make
 cargo build --release --package outboxd
 
 %install
 install -D -p -m 755 target/release/outboxd %{buildroot}%{_bindir}/outboxd
+mkdir -p %{buildroot}%{_mandir}/man1/
+install -D -p -m 644 man/outboxd.1.gz %{buildroot}%{_mandir}/man1/outboxd.gz
+install -D -p -m 644 man/garden.tau.Outbox.1.gz %{buildroot}%{_mandir}/man1/garden.tau.Outbox.1.gz
 install -D -p -m 644 outbox-sysusers.conf %{buildroot}%{_sysusersdir}/%{name}.conf
 install -D -p -m 644 outboxd.service %{buildroot}%{_unitdir}/outboxd.service
 install -D -p -m 644 dbus-1/system-services/garden.tau.Outbox.service %{buildroot}%{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
@@ -55,6 +59,8 @@ install -D -d -m 700 %{buildroot}%{_localstatedir}/log/outboxd
 %files
 %{_sysusersdir}/%{name}.conf
 %{_bindir}/outboxd
+%{_mandir}/man1/garden.tau.Outbox.*
+%{_mandir}/man1/outboxd.*
 %{_unitdir}/outboxd.service
 %{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
 %{_datarootdir}/dbus-1/system.d/garden.tau.Outbox.conf

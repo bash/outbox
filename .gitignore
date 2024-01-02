@@ -1,3 +1,4 @@
 /target/
 /failed/
 /pending/
+/man/*.gz
