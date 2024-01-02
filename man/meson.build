@@ -5,7 +5,7 @@ man_pages = [
 ]
 
 if not gzip.found()
-    message('gzip not found; man pages will not be generated')
+    warning('gzip not found; man pages will not be generated')
 else
     foreach tuple : man_pages
         stem = tuple[0]
