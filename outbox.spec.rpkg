@@ -25,23 +25,23 @@ A mail queue daemon for msmtp
 {{{ git_dir_setup_macro }}}
 
 %build
-BINDIR=%{_bindir} SYSCONFDIR=%{_sysconfdir} LOGDIR=%{_localstatedir}/log SHAREDSTATEDIR=%{_sharedstatedir} envsubst < rpm/outboxd.service > outboxd.service
-SHAREDSTATEDIR=%{_sharedstatedir} envsubst < rpm/outboxd-sysusers.conf > outboxd-sysusers.conf
+BINDIR=%{_bindir} SYSCONFDIR=%{_sysconfdir} LOGDIR=%{_localstatedir}/log SHAREDSTATEDIR=%{_sharedstatedir} envsubst < systemd/system/outboxd.service > outboxd.service
+SHAREDSTATEDIR=%{_sharedstatedir} envsubst < sysusers.d/outbox.conf > outbox-sysusers.conf
 cargo build --release --package outboxd
 
 %install
 install -D -p -m 755 target/release/outboxd %{buildroot}%{_bindir}/outboxd
-install -D -p -m 644 outboxd-sysusers.conf %{buildroot}%{_sysusersdir}/%{name}.conf
+install -D -p -m 644 outbox-sysusers.conf %{buildroot}%{_sysusersdir}/%{name}.conf
 install -D -p -m 644 outboxd.service %{buildroot}%{_unitdir}/outboxd.service
-install -D -p -m 644 rpm/garden.tau.Outbox.service %{buildroot}%{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
-install -D -p -m 644 rpm/garden.tau.Outbox.conf %{buildroot}%{_datarootdir}/dbus-1/system.d/garden.tau.Outbox.conf
-install -D -p -m 600 rpm/msmtprc %{buildroot}%{_sysconfdir}/outboxd/msmtprc
+install -D -p -m 644 dbus-1/system-services/garden.tau.Outbox.service %{buildroot}%{_datarootdir}/dbus-1/system-services/garden.tau.Outbox.service
+install -D -p -m 644 dbus-1/system.d/garden.tau.Outbox.conf %{buildroot}%{_datarootdir}/dbus-1/system.d/garden.tau.Outbox.conf
+install -D -p -m 600 msmtprc %{buildroot}%{_sysconfdir}/outboxd/msmtprc
 install -D -d -m 700 %{buildroot}%{_sharedstatedir}/outboxd
 install -D -d -m 700 %{buildroot}%{_localstatedir}/log/outboxd
 
 %pre
 # This ensures that the users are created *before* file attributes are applied
-%sysusers_create_package %{name} rpm/outboxd-sysusers.conf
+%sysusers_create_package %{name} outbox-sysusers.conf
 
 %post
 %systemd_post outboxd.service
