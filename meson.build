@@ -12,8 +12,9 @@ cargo_sources = files(
 )
 cargo_options = [ '--manifest-path', source_root / 'Cargo.toml' ]
 cargo_options += [ '--target-dir', build_root / 'src' ]
+cargo_options += [ '--package', 'outboxd' ]
 
-if get_option('buildtype') == 'debug'
+if get_option('debug')
   rust_target = 'debug'
 else
   cargo_options += [ '--release' ]
