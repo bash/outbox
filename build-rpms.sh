@@ -21,9 +21,12 @@ function cleanup {
 
 trap cleanup EXIT
 
-step "Exporting working tree"
-stash=$(git stash create)
-git archive --format tar.gz --output "$source_dir/sources.tar.gz" "$stash"
+ref=$(git stash create)
+if [[ -z "$ref" ]];
+  then ref=HEAD
+fi
+step "Exporting working tree ($ref)"
+git archive --format tar.gz --output "$source_dir/sources.tar.gz" "$ref"
 
 step "Building RPM packages"
 rpmbuild -ba outbox.spec \
