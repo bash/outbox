@@ -9,7 +9,8 @@ fn main() -> Result<()> {
         .tempfile_in(cache_dir()?)?;
     let mut stdin_lock = stdin().lock();
     io::copy(&mut stdin_lock, &mut temp_file)?;
-    opener::open(temp_file.path())?;
+    let (_, path) = temp_file.keep()?;
+    opener::open(path)?;
     Ok(())
 }
 
