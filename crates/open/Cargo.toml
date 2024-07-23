@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.75"
+anyhow.workspace = true
 dirs = "5.0.1"
-opener = "0.6.1"
+opener = "0.7"
 tempfile = "3"

@@ -6,7 +6,7 @@ members = ["crates/outboxd", "crates/outbox", "crates/open"]
 anyhow = "1.0.75"
 tokio = "1.32.0"
 serde = "1.0.193"
-zbus = { version = "3.14.1", default-features = false }
+zbus = { version = "4.4", default-features = false }
 uuid = "1.4.1"
 async-trait = "0.1.75"
 tokio-pipe = "0.2.12"

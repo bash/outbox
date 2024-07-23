@@ -1,10 +1,10 @@
 use anyhow::{anyhow, Context as _, Result};
+use serde::Serialize;
 use std::env::{self, VarError};
 use std::ffi::OsStr;
 use std::fmt::Display;
 use std::fs::remove_file;
 use std::io::{self, ErrorKind};
-use std::os::fd::{AsRawFd as _, FromRawFd as _};
 use std::path::{Path, PathBuf};
 use tokio::fs::{self, create_dir_all, rename, File, OpenOptions};
 use tokio::process::Command;
@@ -13,8 +13,8 @@ use tokio::signal::unix::{signal, SignalKind};
 use tokio::sync::mpsc::{unbounded_channel, UnboundedSender};
 use uuid::Uuid;
 use zbus::zvariant::OwnedFd;
-use zbus::DBusError;
-use zbus::{dbus_interface, ConnectionBuilder};
+use zbus::ConnectionBuilder;
+use zbus::{interface, DBusError};
 
 const PENDING_DIRECTORY: &str = "pending";
 const FAILED_DIRECTORY: &str = "failed";
@@ -55,18 +55,19 @@ fn connection_builder() -> Result<ConnectionBuilder<'static>> {
 
 struct Outbox(UnboundedSender<PathBuf>);
 
-#[dbus_interface(name = "garden.tau.Outbox1")]
+#[interface(interface = "garden.tau.Outbox1")]
 impl Outbox {
     async fn queue(&self, mail: OwnedFd) -> Result<(), QueueError> {
-        let mut file = unsafe { File::from_raw_fd(mail.as_raw_fd()) };
+        let fd: std::os::fd::OwnedFd = mail.into();
+        let mut file = File::from(std::fs::File::from(fd));
         let path = write_pending_mail(&mut file).await?;
         _ = self.0.send(path); // If the channel is closed that means we're shutting down
         Ok(())
     }
 }
 
-#[derive(Debug, DBusError)]
-#[dbus_error(prefix = "garden.tau.Outbox")]
+#[derive(Debug, DBusError, Serialize)]
+#[zbus(prefix = "garden.tau.Outbox")]
 enum QueueError {
     Io(String),
 }

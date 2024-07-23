@@ -11,6 +11,8 @@ source_dir="$temp_dir/source"
 mkdir -p "$source_dir"
 build_dir="$temp_dir/build"
 mkdir -p "$build_dir"
+build_root_dir="$temp_dir/buildroot"
+mkdir -p "$build_root_dir"
 
 step "Using directory $temp_dir"
 
@@ -32,5 +34,7 @@ step "Building RPM packages"
 rpmbuild -ba outbox.spec \
     --define "_sourcedir $source_dir" \
     --define "_builddir $build_dir" \
-    --buildroot "$temp_dir/buildroot" \
-    --define '_rpmdir _rpms'
+    --define "_buildrootdir $build_root_dir" \
+    --buildroot "$build_root_dir" \
+    --define '_rpmdir _rpms' \
+    --define '_srcrpmdir _rpms'

@@ -32,7 +32,7 @@ impl Outbox {
     pub async fn queue<M: OutboxMessage>(&self, message: M) -> Result<()> {
         let proxy = dbus::OutboxProxy::new(&self.0).await?;
         let (read_fd, mut writer) = message.into_writer().await?;
-        let future = proxy.queue(dbus::to_zvariant_fd(read_fd));
+        let future = proxy.queue(read_fd.into());
         writer.flush().await?;
         future.await?;
         Ok(())
@@ -100,11 +100,10 @@ impl<'a> OutboxMessageWriter for BytesWriter<'a> {
 
 mod dbus {
     use std::fmt;
-    use std::os::fd::{FromRawFd as _, IntoRawFd as _};
     use zbus::zvariant::OwnedFd;
-    use zbus::{dbus_proxy, DBusError};
+    use zbus::{proxy, DBusError};
 
-    #[dbus_proxy(
+    #[proxy(
         interface = "garden.tau.Outbox1",
         default_service = "garden.tau.Outbox",
         default_path = "/garden/tau/Outbox"
@@ -114,9 +113,9 @@ mod dbus {
     }
 
     #[derive(Debug, DBusError)]
-    #[dbus_error(prefix = "garden.tau.Outbox", impl_display = false)]
+    #[zbus(prefix = "garden.tau.Outbox", impl_display = false)]
     pub(crate) enum QueueError {
-        #[dbus_error(zbus_error)]
+        #[zbus(error)]
         Zbus(zbus::Error),
         Io(String),
     }
@@ -132,9 +131,5 @@ mod dbus {
                 }
             }
         }
-    }
-
-    pub(crate) fn to_zvariant_fd(fd: std::os::fd::OwnedFd) -> OwnedFd {
-        unsafe { OwnedFd::from_raw_fd(fd.into_raw_fd()) }
     }
 }
