@@ -1,4 +1,3 @@
-use anyhow::bail;
 use anyhow::Result;
 use futures::future::BoxFuture;
 use futures::{FutureExt, StreamExt as _};
@@ -10,6 +9,7 @@ use hyper_util::server::conn::auto;
 use hyper_util::server::graceful::GracefulShutdown;
 use listenfd::ListenFd;
 use std::error::Error as StdError;
+use std::fs;
 use std::io::{self};
 use std::path::PathBuf;
 use std::pin::pin;
@@ -37,6 +37,7 @@ pub(crate) fn spawn_http_server(
             "warn: Prefer socket activation to starting the service immediately.
 tip: you can start outboxd with `systemd-socket-activate --listen=/path/to/outbox.sock outboxd`"
         );
+        fs::remove_file("outbox.sock")?;
         UnixListener::bind("outbox.sock")?
     };
     let local_addr = listener.local_addr()?;

@@ -10,3 +10,4 @@ edition = "2021"
 # tokio = { workspace = true, features = ["fs"] }
 # async-trait.workspace = true
 # tokio-pipe.workspace = true
+reqwest.workspace = true

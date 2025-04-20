@@ -1,16 +1,15 @@
 [package]
 name = "outboxd"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
 anyhow.workspace = true
 tokio = { workspace = true, features = ["full"] }
+tokio-util.workspace = true
 hyper = { workspace = true, features = ["full"] }
-http-body-util.workspace = true
 hyper-util = { workspace = true, features = ["full"] }
+http-body-util.workspace = true
 uuid = { workspace = true, features = ["v4"] }
 listenfd.workspace = true
-etcetera.workspace = true
 futures.workspace = true
-tokio-util.workspace = true

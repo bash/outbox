@@ -1,16 +1,18 @@
 [workspace]
 resolver = "2"
-members = ["crates/outboxd", "crates/outbox", "crates/open"]
+members = ["crates/outboxd", "crates/outbox"]
 
 [workspace.dependencies]
 anyhow = "1.0.75"
-serde = "1.0.193"
 hyper = "1"
 tokio = "1"
 http-body-util = "0.1"
 hyper-util = "0.1"
 uuid = "1.4.1"
 listenfd = "1"
-etcetera = "0.10"
 futures = "0.3"
 tokio-util = "0.7"
+reqwest = "0.12.15"
+
+[patch.crates-io]
+reqwest = { git = "https://github.com/seanmonstar/reqwest.git", branch = "uds" }
