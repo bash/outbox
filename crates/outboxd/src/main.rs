@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 use std::process::ExitCode;
 use tokio::signal;
 use tokio::sync::mpsc::unbounded_channel;
@@ -12,8 +12,10 @@ async fn main() -> Result<ExitCode> {
     let shutdown = CancellationToken::new();
     let (tx, rx) = unbounded_channel();
     sender::spawn_sender(rx, shutdown.clone());
-    http_server::spawn_http_server(tx.clone(), shutdown.clone())?;
-    sender::queue_pending_mails(tx.clone()).await?;
+    http_server::spawn_http_server(tx.clone(), shutdown.clone()).context("spawn http server")?;
+    sender::queue_pending_mails(tx.clone())
+        .await
+        .context("re-queue pending mails")?;
     signal::ctrl_c().await.expect("failed to listen for event");
     shutdown.cancel();
 
