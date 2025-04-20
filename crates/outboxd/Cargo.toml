@@ -6,6 +6,11 @@ edition = "2021"
 [dependencies]
 anyhow.workspace = true
 tokio = { workspace = true, features = ["full"] }
-serde = { workspace = true, features = ["derive"] }
-zbus = { workspace = true, default-features = false, features = ["tokio"] }
+hyper = { workspace = true, features = ["full"] }
+http-body-util.workspace = true
+hyper-util = { workspace = true, features = ["full"] }
 uuid = { workspace = true, features = ["v4"] }
+listenfd.workspace = true
+etcetera.workspace = true
+futures.workspace = true
+tokio-util.workspace = true

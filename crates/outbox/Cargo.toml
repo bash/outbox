@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow.workspace = true
-serde = { workspace = true, features = ["derive"] }
-zbus = { workspace = true, default-features = false, features = ["tokio"] }
-tokio = { workspace = true, features = ["fs"] }
-async-trait.workspace = true
-tokio-pipe.workspace = true
+# anyhow.workspace = true
+# serde = { workspace = true, features = ["derive"] }
+# zbus = { workspace = true, default-features = false, features = ["tokio"] }
+# tokio = { workspace = true, features = ["fs"] }
+# async-trait.workspace = true
+# tokio-pipe.workspace = true
