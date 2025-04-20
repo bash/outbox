@@ -30,11 +30,14 @@ pub(crate) fn spawn_http_server(
     tx: UnboundedSender<PathBuf>,
     shutdown: CancellationToken,
 ) -> Result<()> {
-    let Some(listener) = listener_from_env()? else {
-        bail!(
-            "Failed to retrieve listener from environment
+    let listener = if let Some(listener) = listener_from_env()? {
+        listener
+    } else {
+        eprintln!(
+            "warn: Prefer socket activation to starting the service immediately.
 tip: you can start outboxd with `systemd-socket-activate --listen=/path/to/outbox.sock outboxd`"
         );
+        UnixListener::bind("outbox.sock")?
     };
     let local_addr = listener.local_addr()?;
     eprintln!("Listening on {:?}", local_addr);
