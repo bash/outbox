@@ -17,6 +17,7 @@ use tokio::fs::{create_dir_all, OpenOptions};
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::UnixListener;
 use tokio::sync::mpsc::UnboundedSender;
+use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
@@ -29,7 +30,7 @@ const BODY_SIZE_LIMIT: usize = 100 * (1 << 10);
 pub(crate) fn spawn_http_server(
     tx: UnboundedSender<PathBuf>,
     shutdown: CancellationToken,
-) -> Result<()> {
+) -> Result<JoinHandle<Result<()>>> {
     let listener = if let Some(listener) = listener_from_env()? {
         listener
     } else {
@@ -42,8 +43,7 @@ tip: you can start outboxd with `systemd-socket-activate --listen=/path/to/outbo
     };
     let local_addr = listener.local_addr()?;
     eprintln!("Listening on {:?}", local_addr);
-    tokio::spawn(run_http_server(tx, listener, shutdown));
-    Ok(())
+    Ok(tokio::spawn(run_http_server(tx, listener, shutdown)))
 }
 
 async fn run_http_server(

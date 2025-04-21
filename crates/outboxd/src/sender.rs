@@ -8,14 +8,18 @@ use std::path::{Path, PathBuf};
 use tokio::fs::{self, create_dir_all, rename};
 use tokio::process::Command;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
 
 pub(crate) const PENDING_DIRECTORY: &str = "pending";
 const FAILED_DIRECTORY: &str = "failed";
 const DEFAULT_SENDMAIL_COMMAND: &str = "msmtp";
 
-pub(crate) fn spawn_sender(rx: UnboundedReceiver<PathBuf>, shutdown: CancellationToken) {
-    tokio::spawn(run_sender(rx, shutdown));
+pub(crate) fn spawn_sender(
+    rx: UnboundedReceiver<PathBuf>,
+    shutdown: CancellationToken,
+) -> JoinHandle<Result<()>> {
+    tokio::spawn(run_sender(rx, shutdown))
 }
 
 pub(crate) async fn queue_pending_mails(sender: UnboundedSender<PathBuf>) -> Result<()> {
