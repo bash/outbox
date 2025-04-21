@@ -9,6 +9,5 @@ COPY --from=builder /usr/local/cargo/bin/outboxd /usr/local/bin/outboxd
 RUN mkdir -p /etc/outboxd
 RUN mkdir -p /var/log/outboxd
 VOLUME /var/lib/outboxd
-VOLUME /etc/outboxd
 WORKDIR /var/lib/outboxd
 CMD ["outboxd", "-C", "/etc/outboxd/msmtprc", "--logfile", "/var/log/outboxd/msmtp.log"]
