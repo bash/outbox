@@ -1,0 +1,4 @@
+[Unit]
+Description=State volume for outboxd
+
+[Volume]

@@ -1,5 +1,0 @@
-[D-BUS Service]
-Name=garden.tau.Outbox
-Exec=/bin/false
-User=outboxd
-SystemdService=outboxd.service

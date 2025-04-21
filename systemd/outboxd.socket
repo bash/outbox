@@ -1,0 +1,12 @@
+[Unit]
+Description=Outbox API socket
+After=network-online.target
+
+[Socket]
+ListenStream=%t/outbox/outbox.sock
+SocketMode=0660
+SocketUser=outboxd
+SocketGroup=outbox
+
+[Install]
+WantedBy=sockets.target
