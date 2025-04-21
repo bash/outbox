@@ -11,6 +11,7 @@ After=outboxd.socket
 Image=codeberg.org/tautropfli/outboxd
 Volume=outboxd-state.volume:/var/lib/outboxd
 Volume=/etc/outboxd:/etc/outboxd:ro
+Network=host
 
 [Service]
 Restart=always
