@@ -10,7 +10,7 @@ After=outboxd.socket
 [Container]
 Image=codeberg.org/tautropfli/outboxd
 Volume=outboxd-state.volume:/var/lib/outboxd
-Volume=/etc/outboxd:/etc/outboxd,ro
+Volume=/etc/outboxd:/etc/outboxd:ro
 
 [Service]
 Restart=always
